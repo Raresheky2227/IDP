@@ -1,0 +1,34 @@
+0.1.0 – 2025-04-25
+Added
+user-auth-service
+
+Spring Boot application with JWT-based authentication
+
+User entity, UserRepository, Signup & Login endpoints
+
+Dockerfile + Docker Compose for PostgreSQL backing store
+
+
+0.2.0 – 2025-04-26
+Added
+api-gateway
+
+Spring Cloud Gateway scaffold with routing rules for /auth/**, /users/**, /events/**
+
+Custom AuthenticationFilter to validate incoming JWTs
+
+Dockerfile and Compose service entry
+
+Shared JwtUtil class extracted (will be moved to shared-lib)
+
+Changed
+Updated groupId for all gateway classes to com.raresheky.apigateway
+
+0.2.1 – 2025-04-27
+Added
+-
+
+Changed
+Several bux fixes
+
+Updated logic and workflow

@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  gateway:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      JWT_SECRET: verySecretKeyHere
+      JWT_EXPIRATION_MS: 86400000
+    depends_on:
+      - auth
+      - event-manager
+
+  # Stub definitions—point to your other services
+  auth:
+    image: your-registry/user-auth-service:latest
+  event-manager:
+    image: your-registry/event-manager-service:latest
