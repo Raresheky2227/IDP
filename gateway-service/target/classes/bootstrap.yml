@@ -1,0 +1,5 @@
+spring:
+  cloud:
+    gateway:
+    # routes defined in GatewayConfig.java; this file can hold defaults if you prefer YAML routing
+    # kept minimal here since routes are in code

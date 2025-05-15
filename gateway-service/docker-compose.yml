@@ -1,0 +1,43 @@
+# docker-compose.yml
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: authdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  auth-service:
+    build:
+      context: ../AUTH-SERVICE    # adjust path if needed
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/authdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      JWT_SECRET: jj/d7SSI1Q5X8Cyznz1wNECeWnIVUsYgMnEGp5DemaGmyD1P0TfLXeFjjsZLEVLMCkeDia/5qh5dMWQUpnWv8g
+      JWT_EXPIRATION_MS: 86400000
+    depends_on:
+      - db
+
+  gateway-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"        # host:container
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:8080
+      JWT_SECRET: jj/d7SSI1Q5X8Cyznz1wNECeWnIVUsYgMnEGp5DemaGmyD1P0TfLXeFjjsZLEVLMCkeDia/5qh5dMWQUpnWv8g
+      SERVER_PORT: 8080
+    depends_on:
+      - auth-service
+
+volumes:
+  db-data:
