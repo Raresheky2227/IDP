@@ -14,24 +14,30 @@ public class GatewayConfig {
     @Value("${auth.service.url}")
     private String authServiceUrl;
 
+    @Value("${event.service.url}")
+    private String eventServiceUrl;
+
     @Bean
     public RouteLocator gatewayRoutes(RouteLocatorBuilder builder,
                                       JwtAuthenticationFilter jwtFilter) {
         return builder.routes()
-                // Public auth endpoints (login/signup) → Auth service
                 .route("auth-service", r -> r
-                        .path("/auth/**")
-                        .filters(f -> f.stripPrefix(1))
+                        .path("/api/auth/**")
                         .uri(authServiceUrl)
                 )
-                // Secured user endpoints → Auth service, with JWT filter
                 .route("user-service", r -> r
-                        .path("/users/**")
-                        .filters(f -> f
-                                .filter(jwtFilter)
-                                .stripPrefix(1)
-                        )
+                        .path("/api/users/**")
+//                        .filters(f -> f.filter(jwtFilter))
                         .uri(authServiceUrl)
+                )
+                .route("event-service", r -> r
+                        .path("/api/events/**")
+//                        .filters(f -> f.filter(jwtFilter))
+                        .uri(eventServiceUrl)
+                )
+                .route("notification-service", r -> r
+                        .path("/api/notifications/**")
+                        .uri("http://notification-service:8083")
                 )
                 .build();
     }

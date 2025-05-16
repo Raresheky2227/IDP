@@ -1,4 +1,4 @@
-# docker-compose.yml
+version: '3.8'
 services:
   db:
     image: postgres:14
@@ -13,8 +13,8 @@ services:
 
   auth-service:
     build:
-      context: ../AUTH-SERVICE    # adjust path if needed
-      dockerfile: Dockerfile
+      context: ../auth-service
+    image: auth-service:latest
     ports:
       - "8080:8080"
     environment:
@@ -26,18 +26,83 @@ services:
     depends_on:
       - db
 
+  event-service:
+    build:
+      context: ../EventManager
+    image: eventmanager:latest
+    ports:
+      - "8082:8082"
+    environment:
+      JWT_SECRET: jj/d7SSI1Q5X8Cyznz1wNECeWnIVUsYgMnEGp5DemaGmyD1P0TfLXeFjjsZLEVLMCkeDia/5qh5dMWQUpnWv8g
+    depends_on:
+      - auth-service
+
   gateway-service:
     build:
       context: .
-      dockerfile: Dockerfile
+    image: gateway-service:latest
     ports:
-      - "8081:8080"        # host:container
+      - "8081:8080"
     environment:
       AUTH_SERVICE_URL: http://auth-service:8080
+      EVENT_SERVICE_URL: http://event-service:8082
       JWT_SECRET: jj/d7SSI1Q5X8Cyznz1wNECeWnIVUsYgMnEGp5DemaGmyD1P0TfLXeFjjsZLEVLMCkeDia/5qh5dMWQUpnWv8g
       SERVER_PORT: 8080
     depends_on:
       - auth-service
+      - event-service
+
+  notification-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notification_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - notification-db-data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"   # SMTP server
+      - "8025:8025"   # Web UI at http://localhost:8025
+
+  notification-service:
+    build:
+      context: ../notification-service
+    image: notification-service:latest
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:5432/notification_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      # MailHog config, matches application.yml
+      SPRING_MAIL_HOST: mailhog
+      SPRING_MAIL_PORT: 1025
+      # No user/pass required for MailHog, but can include blank if you wish:
+      SPRING_MAIL_USERNAME:
+      SPRING_MAIL_PASSWORD:
+    depends_on:
+      - notification-db
+      - rabbitmq
+      - mailhog
 
 volumes:
   db-data:
+  notification-db-data:

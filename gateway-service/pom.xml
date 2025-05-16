@@ -9,6 +9,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <!-- Inherit dependency versions from Spring Boot -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -21,6 +22,7 @@
         <spring-cloud.version>2021.0.5</spring-cloud.version>
     </properties>
 
+    <!-- Import Spring Cloud BOM for gateway -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -34,7 +36,7 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- API Gateway & WebFlux -->
+        <!-- Spring Cloud Gateway & WebFlux -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
@@ -44,13 +46,19 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
-        <!-- Security -->
+        <!-- Reactive OAuth2 Resource Server support (brings in spring-security-webflux) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
+        <!-- Core Spring Security (for annotations, core filters, etc.) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- JWT parsing -->
+        <!-- JWT parsing (JJWT) -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
@@ -90,7 +98,7 @@
 
     <build>
         <plugins>
-            <!-- Package as executable jar -->
+            <!-- Spring Boot plugin to package executable JAR -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
