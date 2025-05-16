@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  event-service:
+    image: eventmanager:latest
+    build:
+      context: .
+    ports:
+      - "8082:8080"
+    environment:
+      # must match exactly the JWT_SECRET in your auth & gateway
+      JWT_SECRET: jj/d7SSI1Q5X8Cyznz1wNECeWnIVUsYgMnEGp5DemaGmyD1P0TfLXeFjjsZLEVLMCkeDia/5qh5dMWQUpnWv8g

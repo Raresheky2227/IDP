@@ -1,0 +1,14 @@
+[
+  {
+    "id": "1",
+    "title": "Spring Boot Workshop",
+    "description": "Learn Spring Boot basics",
+    "pdfPath": "event-1-details.pdf"
+  },
+  {
+    "id": "2",
+    "title": "Docker Deep Dive",
+    "description": "Master Docker containers",
+    "pdfPath": "event-2-details.pdf"
+  }
+]

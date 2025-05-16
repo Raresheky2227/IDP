@@ -1,0 +1,24 @@
+server:
+  port: 8082
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: always
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+      # no `jwt:` block here
+
+jwt:
+  secret: ${JWT_SECRET:ChangeMeJWTSecretKey}
+
+logging:
+  level:
+    root: INFO
+    com.example.eventmanager: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2.server.resource: TRACE
+    org.springframework.security.oauth2.server.resource.authentication: TRACE
+    org.springframework.security.oauth2.server.resource.web: TRACE
