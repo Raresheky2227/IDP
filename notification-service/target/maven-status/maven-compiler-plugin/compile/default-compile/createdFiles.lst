@@ -1,0 +1,7 @@
+com\raresheky\notification\model\Notification.class
+com\raresheky\notification\repository\NotificationRepository.class
+com\raresheky\notification\controller\NotificationController.class
+com\raresheky\notification\NotificationServiceApplication.class
+com\raresheky\notification\service\NotificationService.class
+com\raresheky\notification\config\RabbitMQConfig.class
+com\raresheky\notification\listener\EventListener.class
