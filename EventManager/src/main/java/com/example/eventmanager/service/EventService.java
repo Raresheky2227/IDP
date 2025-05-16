@@ -51,7 +51,7 @@ public class EventService {
     }
 
     public Optional<Event> getEventById(String id) {
-        return eventRepository.findById(id);
+        return eventRepository.findById(Long.valueOf(id));
     }
 
     public void subscribe(String userId, String eventId) {
@@ -59,7 +59,6 @@ public class EventService {
             Subscription sub = new Subscription(userId, eventId);
             subscriptionRepository.save(sub);
 
-            // Send notification event to RabbitMQ
             JSONObject event = new JSONObject();
             event.put("type", "event_subscription");
             event.put("recipient", userId);
@@ -82,16 +81,13 @@ public class EventService {
         subscriptionRepository.deleteByUserIdAndEventId(userId, eventId);
     }
 
-    // VIP function: add new event
     public Event addEvent(Event event) {
         return eventRepository.save(event);
     }
 
-    // VIP function: delete event
     @Transactional
     public void deleteEvent(String eventId) {
-        // Optional: delete related subscriptions
         subscriptionRepository.deleteByEventId(eventId);
-        eventRepository.deleteById(eventId);
+        eventRepository.deleteById(Long.valueOf(eventId));
     }
 }

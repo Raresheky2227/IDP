@@ -1,9 +1,10 @@
 CREATE TABLE events (
-                        id VARCHAR(255) PRIMARY KEY,
+                        id SERIAL PRIMARY KEY,
                         title VARCHAR(255),
                         description TEXT,
                         pdf_path VARCHAR(255)
 );
+
 
 CREATE TABLE subscriptions (
                                id SERIAL PRIMARY KEY,
