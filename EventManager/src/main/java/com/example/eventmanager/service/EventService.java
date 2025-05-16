@@ -1,22 +1,25 @@
 package com.example.eventmanager.service;
 
 import com.example.eventmanager.model.Event;
+import com.example.eventmanager.model.Subscription;
+import com.example.eventmanager.repository.EventRepository;
+import com.example.eventmanager.repository.SubscriptionRepository;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.json.JSONObject;
 
 import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.*;
 
 @Service
 public class EventService {
     private List<Event> events = new ArrayList<>();
-    private Map<String, Set<String>> subscriptions = new HashMap<>();
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -24,34 +27,71 @@ public class EventService {
     @Autowired
     private AmqpTemplate amqpTemplate;
 
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
+
     @PostConstruct
     public void init() throws IOException {
-        events = objectMapper.readValue(
-                new ClassPathResource("events.json").getInputStream(),
-                new TypeReference<List<Event>>() {}
-        );
+        // Load events.json only if DB is empty (first run)
+        if (eventRepository.count() == 0) {
+            List<Event> loadedEvents = objectMapper.readValue(
+                    new ClassPathResource("events.json").getInputStream(),
+                    new TypeReference<List<Event>>() {}
+            );
+            eventRepository.saveAll(loadedEvents);
+        }
+        events = eventRepository.findAll();
     }
 
     public List<Event> getAllEvents() {
-        return events;
+        return eventRepository.findAll();
     }
 
     public Optional<Event> getEventById(String id) {
-        return events.stream().filter(e -> e.getId().equals(id)).findFirst();
+        return eventRepository.findById(id);
     }
 
     public void subscribe(String userId, String eventId) {
-        subscriptions.computeIfAbsent(userId, k -> new HashSet<>()).add(eventId);
+        if (subscriptionRepository.findByUserIdAndEventId(userId, eventId).isEmpty()) {
+            Subscription sub = new Subscription(userId, eventId);
+            subscriptionRepository.save(sub);
 
-        // Send notification event to RabbitMQ
-        JSONObject event = new JSONObject();
-        event.put("type", "event_subscription");
-        event.put("recipient", userId);
-        event.put("details", eventId);
-        amqpTemplate.convertAndSend("notification-queue", event.toString());
+            // Send notification event to RabbitMQ
+            JSONObject event = new JSONObject();
+            event.put("type", "event_subscription");
+            event.put("recipient", userId);
+            event.put("details", eventId);
+            amqpTemplate.convertAndSend("notification-queue", event.toString());
+        }
     }
 
     public Set<String> getSubscriptions(String userId) {
-        return subscriptions.getOrDefault(userId, Collections.emptySet());
+        List<Subscription> subs = subscriptionRepository.findByUserId(userId);
+        Set<String> eventIds = new HashSet<>();
+        for (Subscription s : subs) {
+            eventIds.add(s.getEventId());
+        }
+        return eventIds;
+    }
+
+    @Transactional
+    public void unsubscribe(String userId, String eventId) {
+        subscriptionRepository.deleteByUserIdAndEventId(userId, eventId);
+    }
+
+    // VIP function: add new event
+    public Event addEvent(Event event) {
+        return eventRepository.save(event);
+    }
+
+    // VIP function: delete event
+    @Transactional
+    public void deleteEvent(String eventId) {
+        // Optional: delete related subscriptions
+        subscriptionRepository.deleteByEventId(eventId);
+        eventRepository.deleteById(eventId);
     }
 }

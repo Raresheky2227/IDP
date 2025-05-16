@@ -7,17 +7,19 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
     private final EventService eventService;
+    private static final Logger log = LoggerFactory.getLogger(EventController.class);
 
     public EventController(EventService eventService) {
         this.eventService = eventService;
@@ -28,15 +30,44 @@ public class EventController {
         return eventService.getAllEvents();
     }
 
+    @PostMapping
+    public ResponseEntity<Event> addEvent(
+            @RequestBody Event event,
+            @RequestParam String username
+    ) {
+        // Any user can add an event
+        log.info("User '{}' is adding event '{}'", username, event.getTitle());
+        Event saved = eventService.addEvent(event);
+        return ResponseEntity.ok(saved);
+    }
+
     @PostMapping("/{id}/subscribe")
     public ResponseEntity<Void> subscribe(
             @PathVariable String id,
-            @AuthenticationPrincipal Jwt jwt
+            @RequestParam String username
     ) {
-        // In tests (filters disabled), jwt may be null; default userId to "unknown"
-        String userId = (jwt != null ? jwt.getSubject() : "unknown");
-        eventService.subscribe(userId, id);
+        log.info("User '{}' subscribing to event '{}'", username, id);
+        eventService.subscribe(username, id);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/unsubscribe")
+    public ResponseEntity<Void> unsubscribe(
+            @PathVariable String id,
+            @RequestParam String username
+    ) {
+        log.info("User '{}' unsubscribing from event '{}'", username, id);
+        eventService.unsubscribe(username, id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/subscriptions")
+    public ResponseEntity<Set<String>> getSubscriptions(
+            @RequestParam String username
+    ) {
+        log.info("User '{}' fetching subscriptions", username);
+        Set<String> subs = eventService.getSubscriptions(username);
+        return ResponseEntity.ok(subs);
     }
 
     @GetMapping("/{id}/pdf")

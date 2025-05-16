@@ -1,6 +1,8 @@
 C:\Users\Raresheky\Desktop\test\special\EventManager\src\main\java\com\example\eventmanager\model\Event.java
 C:\Users\Raresheky\Desktop\test\special\EventManager\src\main\java\com\example\eventmanager\EventManagerApplication.java
+C:\Users\Raresheky\Desktop\test\special\EventManager\src\main\java\com\example\eventmanager\repository\EventRepository.java
 C:\Users\Raresheky\Desktop\test\special\EventManager\src\main\java\com\example\eventmanager\service\EventService.java
+C:\Users\Raresheky\Desktop\test\special\EventManager\src\main\java\com\example\eventmanager\repository\SubscriptionRepository.java
 C:\Users\Raresheky\Desktop\test\special\EventManager\src\main\java\com\example\eventmanager\config\SecurityConfig.java
 C:\Users\Raresheky\Desktop\test\special\EventManager\src\main\java\com\example\eventmanager\model\Subscription.java
 C:\Users\Raresheky\Desktop\test\special\EventManager\src\main\java\com\example\eventmanager\controller\EventController.java

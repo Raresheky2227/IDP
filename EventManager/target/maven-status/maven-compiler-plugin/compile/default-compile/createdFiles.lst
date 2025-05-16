@@ -1,7 +1,9 @@
 com\example\eventmanager\model\Subscription.class
 com\example\eventmanager\model\Event.class
 com\example\eventmanager\service\EventService$1.class
+com\example\eventmanager\repository\EventRepository.class
+com\example\eventmanager\EventManagerApplication.class
+com\example\eventmanager\repository\SubscriptionRepository.class
 com\example\eventmanager\config\SecurityConfig.class
 com\example\eventmanager\controller\EventController.class
-com\example\eventmanager\EventManagerApplication.class
 com\example\eventmanager\service\EventService.class

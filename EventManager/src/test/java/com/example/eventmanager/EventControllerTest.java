@@ -13,7 +13,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -29,7 +31,7 @@ public class EventControllerTest {
     @BeforeEach
     void setUp() {
         when(eventService.getAllEvents()).thenReturn(
-                Collections.singletonList(new Event("1", "Test Event", "Desc", "event-1-details.pdf"))
+                Collections.singletonList(new Event("Test Event", "Desc", "event-1-details.pdf"))
         );
     }
 
@@ -37,13 +39,15 @@ public class EventControllerTest {
     public void listEvents_returnsOk() throws Exception {
         mockMvc.perform(get("/api/events"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value("1"));
+                // .andExpect(jsonPath("$[0].id").value("1")) // You may comment this out if your mock Event does not have ID
+                .andExpect(jsonPath("$[0].title").value("Test Event"));
     }
 
     @Test
     public void subscribe_returnsOk() throws Exception {
-        mockMvc.perform(post("/api/events/1/subscribe"))
+        mockMvc.perform(post("/api/events/1/subscribe")
+                        .param("username", "testuser")) // Required username param
                 .andExpect(status().isOk());
-        verify(eventService).subscribe(anyString(), eq("1"));
+        verify(eventService).subscribe(eq("testuser"), eq("1"));
     }
 }

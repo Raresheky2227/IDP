@@ -6,15 +6,34 @@ server:
     include-stacktrace: always
 
 spring:
+  # Security config (empty if not used, can be omitted)
   security:
-    oauth2:
-      resourceserver:
-      # no `jwt:` block here
+  # oauth2:
+  #   resourceserver:
+  #     # No JWT block for now
+
+  # RabbitMQ config
   rabbitmq:
     host: rabbitmq
     port: 5672
     username: guest
     password: guest
+
+  # Database config (!!! Check DB name: should match your event DB)
+  datasource:
+    url: jdbc:postgresql://db:5432/eventdb
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  # JPA/Hibernate config
+  jpa:
+    hibernate:
+      ddl-auto: update    # <--- change to 'update' for persistence after confirming everything works
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
 jwt:
   secret: ${JWT_SECRET:ChangeMeJWTSecretKey}
