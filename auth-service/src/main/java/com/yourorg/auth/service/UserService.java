@@ -46,11 +46,16 @@ public class UserService implements UserDetailsService {
     }
 
     public JwtResponse authenticateUser(LoginRequest req) {
-        UserDetails u = loadUserByUsername(req.getUsername());
-        if (!encoder.matches(req.getPassword(), u.getPassword())) {
+        User user = (User) loadUserByUsername(req.getUsername());
+        if (!encoder.matches(req.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("Invalid credentials");
         }
-        String token = jwtUtil.generateToken(req.getUsername());
+        // If roles is a List or Set, pick the first, or join as comma-separated if needed
+        String role = user.getRoles();
+        if (role == null) {
+            role = "ROLE_USER";
+        }
+        String token = jwtUtil.generateToken(req.getUsername(), role);
         return new JwtResponse(token, "Bearer", req.getUsername());
     }
 
