@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.json.JSONObject;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -17,13 +19,16 @@ public class UserService implements UserDetailsService {
     private final UserRepository repo;
     private final PasswordEncoder encoder;
     private final JwtUtil jwtUtil;
+    private final AmqpTemplate amqpTemplate;
 
     public UserService(UserRepository repo,
                        PasswordEncoder encoder,
-                       JwtUtil jwtUtil) {
+                       JwtUtil jwtUtil,
+                       AmqpTemplate amqpTemplate) {
         this.repo = repo;
         this.encoder = encoder;
         this.jwtUtil = jwtUtil;
+        this.amqpTemplate = amqpTemplate;
     }
 
     public void registerUser(SignupRequest req) {
@@ -32,6 +37,12 @@ public class UserService implements UserDetailsService {
         u.setPassword(encoder.encode(req.getPassword()));
         u.setRoles(req.getRoles());
         repo.save(u);
+
+        // Send notification event to RabbitMQ
+        JSONObject event = new JSONObject();
+        event.put("type", "signup");
+        event.put("recipient", req.getUsername());
+        amqpTemplate.convertAndSend("notification-queue", event.toString());
     }
 
     public JwtResponse authenticateUser(LoginRequest req) {

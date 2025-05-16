@@ -1,0 +1,15 @@
+com\yourorg\auth\dto\LoginRequest.class
+com\yourorg\auth\security\JwtAuthenticationFilter.class
+com\yourorg\auth\security\JwtUtil.class
+com\yourorg\auth\controller\UserController.class
+com\yourorg\auth\AuthServiceApplication.class
+com\yourorg\auth\exception\GlobalExceptionHandler.class
+com\yourorg\auth\controller\UserController$UserSummary.class
+com\yourorg\auth\security\JwtAuthorizationFilter.class
+com\yourorg\auth\repository\UserRepository.class
+com\yourorg\auth\config\SecurityConfig.class
+com\yourorg\auth\service\UserService.class
+com\yourorg\auth\dto\JwtResponse.class
+com\yourorg\auth\model\User.class
+com\yourorg\auth\controller\AuthController.class
+com\yourorg\auth\dto\SignupRequest.class

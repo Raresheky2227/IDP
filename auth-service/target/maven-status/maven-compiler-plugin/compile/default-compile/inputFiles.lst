@@ -1,0 +1,14 @@
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\security\JwtAuthenticationFilter.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\security\JwtAuthorizationFilter.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\repository\UserRepository.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\controller\AuthController.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\security\JwtUtil.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\dto\JwtResponse.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\dto\LoginRequest.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\exception\GlobalExceptionHandler.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\service\UserService.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\AuthServiceApplication.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\config\SecurityConfig.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\controller\UserController.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\model\User.java
+C:\Users\Raresheky\Desktop\test\special\auth-service\src\main\java\com\yourorg\auth\dto\SignupRequest.java

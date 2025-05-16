@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.amqp.core.AmqpTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @DataJpaTest
 class UserServiceTests {
@@ -21,10 +23,11 @@ class UserServiceTests {
     private UserService svc;
     private PasswordEncoder encoder = new BCryptPasswordEncoder();
     private JwtUtil jwtUtil = new JwtUtil();
+    private AmqpTemplate amqpTemplate = mock(AmqpTemplate.class); // <-- add mock
 
     @BeforeEach
     void init() {
-        svc = new UserService(repo, encoder, jwtUtil);
+        svc = new UserService(repo, encoder, jwtUtil, amqpTemplate); // <-- pass mock here
     }
 
     @Test
