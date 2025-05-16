@@ -6,6 +6,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.json.JSONObject;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -18,6 +20,9 @@ public class EventService {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private AmqpTemplate amqpTemplate;
 
     @PostConstruct
     public void init() throws IOException {
@@ -37,6 +42,13 @@ public class EventService {
 
     public void subscribe(String userId, String eventId) {
         subscriptions.computeIfAbsent(userId, k -> new HashSet<>()).add(eventId);
+
+        // Send notification event to RabbitMQ
+        JSONObject event = new JSONObject();
+        event.put("type", "event_subscription");
+        event.put("recipient", userId);
+        event.put("details", eventId);
+        amqpTemplate.convertAndSend("notification-queue", event.toString());
     }
 
     public Set<String> getSubscriptions(String userId) {
