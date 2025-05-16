@@ -1,7 +1,9 @@
 version: '3.8'
 services:
+  # Auth DB for Auth-Service
   db:
     image: postgres:14
+    container_name: auth-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -10,7 +12,31 @@ services:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # Event DB for Event-Service (separate DB for events!)
+  event-db:
+    image: postgres:14
+    container_name: event-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: eventdb
+    ports:
+      - "5434:5432"
+    volumes:
+      - event-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Auth Microservice
   auth-service:
     build:
       context: ../auth-service
@@ -24,8 +50,10 @@ services:
       JWT_SECRET: jj/d7SSI1Q5X8Cyznz1wNECeWnIVUsYgMnEGp5DemaGmyD1P0TfLXeFjjsZLEVLMCkeDia/5qh5dMWQUpnWv8g
       JWT_EXPIRATION_MS: 86400000
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
+  # Event Microservice
   event-service:
     build:
       context: ../EventManager
@@ -33,10 +61,17 @@ services:
     ports:
       - "8082:8082"
     environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://event-db:5432/eventdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
       JWT_SECRET: jj/d7SSI1Q5X8Cyznz1wNECeWnIVUsYgMnEGp5DemaGmyD1P0TfLXeFjjsZLEVLMCkeDia/5qh5dMWQUpnWv8g
     depends_on:
-      - auth-service
+      auth-service:
+        condition: service_started
+      event-db:
+        condition: service_healthy
 
+  # API Gateway
   gateway-service:
     build:
       context: .
@@ -49,11 +84,15 @@ services:
       JWT_SECRET: jj/d7SSI1Q5X8Cyznz1wNECeWnIVUsYgMnEGp5DemaGmyD1P0TfLXeFjjsZLEVLMCkeDia/5qh5dMWQUpnWv8g
       SERVER_PORT: 8080
     depends_on:
-      - auth-service
-      - event-service
+      auth-service:
+        condition: service_started
+      event-service:
+        condition: service_started
 
+  # Notification DB
   notification-db:
     image: postgres:16
+    container_name: notification-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -62,9 +101,16 @@ services:
       - "5433:5432"
     volumes:
       - notification-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # RabbitMQ for async messaging
   rabbitmq:
     image: rabbitmq:3-management
+    container_name: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -72,12 +118,15 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
 
+  # MailHog for email testing
   mailhog:
     image: mailhog/mailhog
+    container_name: mailhog
     ports:
       - "1025:1025"   # SMTP server
       - "8025:8025"   # Web UI at http://localhost:8025
 
+  # Notification Microservice
   notification-service:
     build:
       context: ../notification-service
@@ -92,17 +141,19 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
-      # MailHog config, matches application.yml
       SPRING_MAIL_HOST: mailhog
       SPRING_MAIL_PORT: 1025
-      # No user/pass required for MailHog, but can include blank if you wish:
       SPRING_MAIL_USERNAME:
       SPRING_MAIL_PASSWORD:
     depends_on:
-      - notification-db
-      - rabbitmq
-      - mailhog
+      notification-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      mailhog:
+        condition: service_started
 
 volumes:
   db-data:
+  event-db-data:
   notification-db-data:
