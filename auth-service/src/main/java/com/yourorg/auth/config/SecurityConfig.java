@@ -15,11 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.cors.CorsConfigurationSource;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -34,13 +29,12 @@ public class SecurityConfig {
                 // 1) Disable CSRF for our stateless REST API
                 .csrf(csrf -> csrf.disable())
 
-                // 2F2) Stateless sessions
+                // 2) Stateless sessions
                 .sessionManagement(sm -> sm
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // 3) Enable CORS so gateway → auth calls succeed without preflight errors
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // 3) REMOVE CORS CONFIG HERE!
 
                 // 4) Authorize: allow signup/login, secure everything else
                 .authorizeHttpRequests(auth -> auth
@@ -55,19 +49,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Configure CORS policy (adjust origins/methods as you see fit)
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration cfg = new CorsConfiguration();
-        cfg.setAllowedOrigins(List.of("*"));              // or lock this down to your gateway’s origin
-        cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
-        cfg.setAllowedHeaders(List.of("*"));
-        cfg.setAllowCredentials(false);
-
-        UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
-        src.registerCorsConfiguration("/**", cfg);
-        return src;
-    }
+    // DELETE THIS WHOLE BEAN:
+    // @Bean
+    // public CorsConfigurationSource corsConfigurationSource() {
+    //     ...
+    // }
 
     @Bean
     public AuthenticationManager authManager(HttpSecurity http,

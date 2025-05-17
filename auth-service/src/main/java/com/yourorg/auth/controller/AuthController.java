@@ -6,6 +6,8 @@ import com.yourorg.auth.dto.SignupRequest;
 import com.yourorg.auth.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -18,10 +20,11 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody SignupRequest req) {
+    public ResponseEntity<?> signup(@RequestBody SignupRequest req) {
         userService.registerUser(req);
-        return ResponseEntity.ok("User registered successfully");
+        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest req) {
