@@ -1,4 +1,5 @@
-com\yourorg\gateway\config\GatewayConfig.class
 com\yourorg\gateway\security\JwtAuthenticationFilter.class
 com\yourorg\gateway\config\WebSecurityConfig.class
 com\yourorg\gateway\GatewayApplication.class
+com\yourorg\gateway\config\CorsConfig.class
+com\yourorg\gateway\config\GatewayConfig.class

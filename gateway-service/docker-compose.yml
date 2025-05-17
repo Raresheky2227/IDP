@@ -70,6 +70,9 @@ services:
         condition: service_started
       event-db:
         condition: service_healthy
+    # --- Bind-mount for uploaded PDFs ---
+    volumes:
+      - ./uploads/pdfs:/app/uploads/pdfs
 
   # API Gateway
   gateway-service:
