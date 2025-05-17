@@ -6,7 +6,7 @@ Project for University.
 
 ### 1. Build All Backend Services
 
-Some tests are currently unstable and may fail, so use:
+Some tests(event manager's to my knowledge) are currently unstable and may fail, so use:
 
 ```
 mvn clean package -DskipTests
@@ -24,11 +24,6 @@ From the `gateway` directory, start everything with Docker Compose:
 docker compose up --build
 ```
 
-- **Gateway:** [http://localhost:8081](http://localhost:8081)  
-  (All API endpoints are routed through this gateway)
-
----
-
 ### 3. Start the Frontend
 
 In the `event-manager-frontend` folder:
@@ -38,17 +33,13 @@ npm install
 npm start
 ```
 
-- **Frontend:** [http://localhost:3000](http://localhost:3000)
+### 4. (Mailhog Notifications
+
+- **Mailhog (Email testing):** Currently sending all mails to "me" actual email addresses to be obtained and used soon™.
 
 ---
 
-### 4. (Optional) Mailhog Notifications
-
-- **Mailhog (Email testing):** [http://localhost:8025](http://localhost:8025)
-
----
-
-## 🔗 Ports Summary
+## 🔗 Ports
 
 | Service           | Port     | URL                                 |
 |-------------------|----------|--------------------------------------|
